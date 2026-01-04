@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi_mcp import FastApiMCP
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from contextlib import asynccontextmanager
@@ -57,7 +58,10 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan
 )
-
+mcp= FastApiMCP(
+    app
+)
+mcp.mount()
 # 配置 CORS (允许所有来源,方便本地调用)
 app.add_middleware(
     CORSMiddleware,
@@ -91,7 +95,7 @@ async def health_check():
         "client_connected": client_ready
     }
 
-
+mcp.setup_server()
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
