@@ -34,21 +34,27 @@ class TraderClient:
             logger.error(f"❌ 交易客户端连接失败: {e}")
             raise
 
-    def buy(self, stock_code: str, price: float, amount: int) -> Dict[str, Any]:
+    def buy(self, stock_code: str, price: float, amount: int, order_type: str = "limit", ttype: str = None) -> Dict[str, Any]:
         """
         买入股票
 
         Args:
             stock_code: 股票代码 (6位数字)
-            price: 委托价格
+            price: 委托价格（市价单时可为 None 或 0）
             amount: 委托数量 (100的整数倍)
+            order_type: 委托类型，"limit" 为限价单，"market" 为市价单，默认为 "limit"
+            ttype: 市价委托类型，如 "对手方最优价格委托"，仅市价单时有效
 
         Returns:
             交易结果
         """
         try:
-            logger.info(f"买入请求: {stock_code}, 价格: {price}, 数量: {amount}")
-            result = self.client.buy(stock_code, price, amount)
+            if order_type == "market":
+                logger.info(f"市价买入请求: {stock_code}, 数量: {amount}, 委托类型: {ttype}")
+                result = self.client.market_buy(stock_code, amount=amount, ttype=ttype or "对手方最优价格委托")
+            else:
+                logger.info(f"限价买入请求: {stock_code}, 价格: {price}, 数量: {amount}")
+                result = self.client.buy(stock_code, price, amount)
             logger.info(f"买入结果: {result}")
             return {
                 "success": True,
@@ -63,21 +69,27 @@ class TraderClient:
                 "data": None
             }
 
-    def sell(self, stock_code: str, price: float, amount: int) -> Dict[str, Any]:
+    def sell(self, stock_code: str, price: float, amount: int, order_type: str = "limit", ttype: str = None) -> Dict[str, Any]:
         """
         卖出股票
 
         Args:
             stock_code: 股票代码 (6位数字)
-            price: 委托价格
+            price: 委托价格（市价单时可为 None 或 0）
             amount: 委托数量 (100的整数倍)
+            order_type: 委托类型，"limit" 为限价单，"market" 为市价单，默认为 "limit"
+            ttype: 市价委托类型，如 "对手方最优价格委托"，仅市价单时有效
 
         Returns:
             交易结果
         """
         try:
-            logger.info(f"卖出请求: {stock_code}, 价格: {price}, 数量: {amount}")
-            result = self.client.sell(stock_code, price, amount)
+            if order_type == "market":
+                logger.info(f"市价卖出请求: {stock_code}, 数量: {amount}, 委托类型: {ttype}")
+                result = self.client.market_sell(stock_code, amount=amount, ttype=ttype or "对手方最优价格委托")
+            else:
+                logger.info(f"限价卖出请求: {stock_code}, 价格: {price}, 数量: {amount}")
+                result = self.client.sell(stock_code, price, amount)
             logger.info(f"卖出结果: {result}")
             return {
                 "success": True,

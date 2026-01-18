@@ -5,8 +5,10 @@ from typing import Optional, Any, Dict
 class BuyRequest(BaseModel):
     """买入请求"""
     stock_code: str = Field(..., description="股票代码(6位数字)", example="000001")
-    price: float = Field(..., gt=0, description="委托价格", example=12.5)
+    price: float = Field(..., ge=0, description="委托价格(市价单可为0)", example=12.5)
     amount: int = Field(..., gt=0, description="委托数量(100的整数倍)", example=100)
+    order_type: str = Field(default="limit", description="委托类型: limit(限价) 或 market(市价)", example="limit")
+    ttype: Optional[str] = Field(None, description="市价委托类型，如: 对手方最优价格委托", example="对手方最优价格委托")
 
     @field_validator('stock_code')
     @classmethod
@@ -22,14 +24,24 @@ class BuyRequest(BaseModel):
         """验证数量必须是100的整数倍"""
         if v % 100 != 0:
             raise ValueError('委托数量必须是100的整数倍')
+        return v
+
+    @field_validator('order_type')
+    @classmethod
+    def validate_order_type(cls, v: str) -> str:
+        """验证委托类型"""
+        if v not in ['limit', 'market']:
+            raise ValueError('委托类型必须是 limit 或 market')
         return v
 
 
 class SellRequest(BaseModel):
     """卖出请求"""
     stock_code: str = Field(..., description="股票代码(6位数字)", example="000001")
-    price: float = Field(..., gt=0, description="委托价格", example=12.5)
+    price: float = Field(..., ge=0, description="委托价格(市价单可为0)", example=12.5)
     amount: int = Field(..., gt=0, description="委托数量(100的整数倍)", example=100)
+    order_type: str = Field(default="limit", description="委托类型: limit(限价) 或 market(市价)", example="limit")
+    ttype: Optional[str] = Field(None, description="市价委托类型，如: 对手方最优价格委托", example="对手方最优价格委托")
 
     @field_validator('stock_code')
     @classmethod
@@ -45,6 +57,14 @@ class SellRequest(BaseModel):
         """验证数量必须是100的整数倍"""
         if v % 100 != 0:
             raise ValueError('委托数量必须是100的整数倍')
+        return v
+
+    @field_validator('order_type')
+    @classmethod
+    def validate_order_type(cls, v: str) -> str:
+        """验证委托类型"""
+        if v not in ['limit', 'market']:
+            raise ValueError('委托类型必须是 limit 或 market')
         return v
 
 

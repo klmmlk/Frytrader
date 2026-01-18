@@ -30,14 +30,18 @@ async def buy_stock(request: BuyRequest):
     买入股票
 
     - **stock_code**: 股票代码(6位数字)
-    - **price**: 委托价格
+    - **price**: 委托价格(市价单可为0)
     - **amount**: 委托数量(必须是100的整数倍)
+    - **order_type**: 委托类型，limit(限价) 或 market(市价)，默认为limit
+    - **ttype**: 市价委托类型，如"对手方最优价格委托"，仅市价单时有效
     """
     client = get_trader_client()
     result = client.buy(
         stock_code=request.stock_code,
         price=request.price,
-        amount=request.amount
+        amount=request.amount,
+        order_type=request.order_type,
+        ttype=request.ttype
     )
     return result
 
@@ -48,14 +52,18 @@ async def sell_stock(request: SellRequest):
     卖出股票
 
     - **stock_code**: 股票代码(6位数字)
-    - **price**: 委托价格
+    - **price**: 委托价格(市价单可为0)
     - **amount**: 委托数量(必须是100的整数倍)
+    - **order_type**: 委托类型，limit(限价) 或 market(市价)，默认为limit
+    - **ttype**: 市价委托类型，如"对手方最优价格委托"，仅市价单时有效
     """
     client = get_trader_client()
     result = client.sell(
         stock_code=request.stock_code,
         price=request.price,
-        amount=request.amount
+        amount=request.amount,
+        order_type=request.order_type,
+        ttype=request.ttype
     )
     return result
 
